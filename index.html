@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Coupon Generator - Sishu Mangal Parsat</title>
+    <style>
+        /* General body styling */
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f4f4f9;
+            color: #333;
+        }
+
+        /* Container for the form and coupons */
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background-color: #fff;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+
+        /* Form styling */
+        #input-form {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+        label {
+            margin-bottom: 5px;
+            font-weight: bold;
+            color: #555;
+        }
+        input {
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 16px;
+        }
+        button {
+            padding: 12px 20px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: bold;
+            transition: background-color 0.3s ease;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+
+        /* Coupon Styling */
+        .coupon-container {
+            margin-top: 40px;
+            display: grid;
+            gap: 30px;
+            /* Hide by default until generated */
+            display: none;
+        }
+        .coupon {
+            border: 2px dashed #007bff;
+            padding: 20px;
+            border-radius: 8px;
+            background-color: #f8faff;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+        .coupon h3 {
+            margin: 0 0 10px;
+            color: #333;
+        }
+        .coupon p {
+            margin: 5px 0;
+            font-size: 14px;
+            color: #666;
+        }
+        .coupon .highlight {
+            font-size: 24px;
+            font-weight: bold;
+            color: #dc3545;
+            margin-top: 10px;
+        }
+
+        /* Specific styles for each coupon type */
+        .caterer-coupon {
+            border-color: #28a745;
+        }
+        .caterer-coupon h3 {
+            color: #28a745;
+        }
+        .school-coupon {
+            border-color: #ffc107;
+        }
+        .school-coupon h3 {
+            color: #ffc107;
+        }
+
+        /* Print-specific styles */
+        @media print {
+            body {
+                background-color: #fff;
+            }
+            .container {
+                box-shadow: none;
+                padding: 0;
+            }
+            #input-form, #generate-btn, .no-print {
+                display: none;
+            }
+            .coupon-container {
+                display: flex;
+                flex-direction: column;
+                gap: 20px;
+                page-break-after: always; /* Ensure each coupon is on a new page */
+            }
+            .coupon {
+                border: 2px solid #000;
+                box-shadow: none;
+                page-break-inside: avoid;
+            }
+            h1 {
+                display: none; /* Hide the main heading on print */
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Sishu Mangal Parsat - Coupon Generator</h1>
+
+        <form id="input-form">
+            <div class="form-group">
+                <label for="school-name">School Name:</label>
+                <input type="text" id="school-name" required>
+            </div>
+            <div class="form-group">
+                <label for="contact-name">Contact Name (Mobile No. Owner):</label>
+                <input type="text" id="contact-name" required>
+            </div>
+            <div class="form-group">
+                <label for="mobile-no">Mobile Number:</label>
+                <input type="tel" id="mobile-no" required>
+            </div>
+            <div class="form-group">
+                <label for="meal-count">Number of Meal Coupons Issued:</label>
+                <input type="number" id="meal-count" min="1" required>
+            </div>
+            <button type="submit" id="generate-btn">Generate Coupons</button>
+        </form>
+
+        <div class="coupon-container" id="coupon-display">
+            <div class="coupon caterer-coupon">
+                <h3>Caterer's Copy</h3>
+                <p><strong>School Name:</strong> <span id="caterer-school"></span></p>
+                <p><strong>Contact Person:</strong> <span id="caterer-contact"></span></p>
+                <p><strong>Mobile No:</strong> <span id="caterer-mobile"></span></p>
+                <p><strong>Number of Meals:</strong> <span id="caterer-meals" class="highlight"></span></p>
+            </div>
+
+            <div class="coupon school-coupon">
+                <h3>School's Copy</h3>
+                <p><strong>School Name:</strong> <span id="school-school"></span></p>
+                <p><strong>Contact Person:</strong> <span id="school-contact"></span></p>
+                <p><strong>Mobile No:</strong> <span id="school-mobile"></span></p>
+                <p><strong>Number of Meals:</strong> <span id="school-meals" class="highlight"></span></p>
+            </div>
+            
+            <button class="no-print" onclick="window.print()">Print Coupons</button>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('input-form').addEventListener('submit', function(event) {
+            event.preventDefault(); // Prevents the form from submitting and refreshing the page
+
+            // Get values from the form
+            const schoolName = document.getElementById('school-name').value;
+            const contactName = document.getElementById('contact-name').value;
+            const mobileNo = document.getElementById('mobile-no').value;
+            const mealCount = document.getElementById('meal-count').value;
+
+            // Update the Caterer's Coupon
+            document.getElementById('caterer-school').textContent = schoolName;
+            document.getElementById('caterer-contact').textContent = contactName;
+            document.getElementById('caterer-mobile').textContent = mobileNo;
+            document.getElementById('caterer-meals').textContent = mealCount;
+
+            // Update the School's Coupon
+            document.getElementById('school-school').textContent = schoolName;
+            document.getElementById('school-contact').textContent = contactName;
+            document.getElementById('school-mobile').textContent = mobileNo;
+            document.getElementById('school-meals').textContent = mealCount;
+
+            // Show the coupons and the print button
+            document.getElementById('coupon-display').style.display = 'grid';
+        });
+    </script>
+</body>
+</html>
