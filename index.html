@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Golden Jubilee Coupon Generator</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <style>
         /* General Body and Container Styling */
         body {
@@ -82,14 +83,14 @@
         button:hover {
             background-color: #0056b3;
         }
-        #whatsapp-btn {
+        #generate-image-btn {
             background-color: #25d366;
         }
-        #whatsapp-btn:hover {
+        #generate-image-btn:hover {
             background-color: #128c7e;
         }
-
-        /* The Coupon (Initially hidden) */
+        
+        /* The Coupon (Hidden by default) */
         .coupon-container {
             display: none;
             margin-top: 40px;
@@ -133,12 +134,21 @@
             background-color: #f9f9f9;
         }
 
+        /* Instructions for after image generation */
+        #instructions {
+            display: none;
+            text-align: center;
+            margin-top: 20px;
+            font-weight: bold;
+            color: #555;
+        }
+
         /* Print-specific styles */
         @media print {
             body {
                 background-color: white;
             }
-            .container, .no-print {
+            .container, .no-print, #instructions {
                 display: none;
             }
             .coupon-container {
@@ -163,7 +173,7 @@
         </div>
         
         <h2>Meal Coupon Generator</h2>
-        <p>Fill in the details below to generate and send a single meal coupon.</p>
+        <p>Fill in the details below to generate a printable coupon or a photo for WhatsApp.</p>
 
         <form id="input-form">
             <div class="form-group">
@@ -194,7 +204,7 @@
 
             <div class="button-group">
                 <button type="submit" id="generate-print-btn">Generate & Print</button>
-                <button type="button" id="whatsapp-btn">Send via WhatsApp</button>
+                <button type="button" id="generate-image-btn">Generate Coupon Image</button>
             </div>
         </form>
     </div>
@@ -227,6 +237,8 @@
         </div>
     </div>
     
+    <p id="instructions" class="no-print">The image has been downloaded! You can now find it in your phone's gallery or downloads folder to share on WhatsApp.</p>
+
     <script>
         const schoolNameInput = document.getElementById('school-name');
         const contactNameInput = document.getElementById('contact-name');
@@ -242,6 +254,7 @@
         const couponBreakfast = document.getElementById('coupon-breakfast');
         const couponLunch = document.getElementById('coupon-lunch');
         const couponDinner = document.getElementById('coupon-dinner');
+        const instructions = document.getElementById('instructions');
 
         // Function to update the coupon on the page
         function updateCoupon() {
@@ -260,6 +273,7 @@
             couponDinner.textContent = dinnerCount;
 
             couponDisplay.style.display = 'block';
+            instructions.style.display = 'none';
         }
 
         // Generate & Print button
@@ -273,24 +287,33 @@
             }
         });
 
-        // WhatsApp button
-        document.getElementById('whatsapp-btn').addEventListener('click', function(event) {
+        // Generate Image button
+        document.getElementById('generate-image-btn').addEventListener('click', function(event) {
             event.preventDefault();
             if (document.getElementById('input-form').checkValidity()) {
-                const schoolName = schoolNameInput.value;
-                const contactName = contactNameInput.value;
-                const mobileNo = mobileNoInput.value;
-                const breakfastCount = breakfastInput.value;
-                const lunchCount = lunchInput.value;
-                const dinnerCount = dinnerInput.value;
+                updateCoupon();
 
-                // Create the pre-filled message
-                const message = `*Sishu Mangal Parsat - Golden Jubilee Coupon*%0A%0A*School Name:* ${schoolName}%0A*Contact Person:* ${contactName}%0A*Mobile No:* ${mobileNo}%0A%0A*Meal Coupons Issued:*%0A- Breakfast: ${breakfastCount}%0A- Lunch: ${lunchCount}%0A- Dinner: ${dinnerCount}%0A%0A_Please present this message to receive your meals._`;
+                // Wait for the coupon to render before taking a screenshot
+                setTimeout(() => {
+                    html2canvas(couponDisplay, { 
+                        scale: 2, // Increase resolution for better quality
+                        backgroundColor: '#fff8e1' // Ensure background is captured
+                    }).then(canvas => {
+                        const imageData = canvas.toDataURL('image/png');
+                        
+                        // Create a temporary link to trigger the download
+                        const link = document.createElement('a');
+                        link.href = imageData;
+                        link.download = `Sishu_Mangal_Parsat_Coupon.png`;
+                        
+                        document.body.appendChild(link);
+                        link.click();
+                        document.body.removeChild(link);
 
-                const whatsappUrl = `https://wa.me/?text=${message}`;
-
-                // Open WhatsApp
-                window.open(whatsappUrl, '_blank');
+                        // Show instructions to the user
+                        instructions.style.display = 'block';
+                    });
+                }, 50); // A small delay to ensure the DOM has updated
             } else {
                 alert('Please fill out all required fields.');
             }
