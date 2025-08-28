@@ -3,180 +3,225 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Coupon Generator - Sishu Mangal Parsat</title>
+    <title>Golden Jubilee Coupons - Sishu Mangal Parsat</title>
     <style>
-        /* General body styling */
+        /* --- General Styling for the Web Page --- */
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-family: 'Times New Roman', Times, serif; /* Formal font */
             margin: 0;
             padding: 20px;
-            background-color: #f4f4f9;
+            background-color: #f8f8e8; /* Light golden background */
             color: #333;
         }
 
-        /* Container for the form and coupons */
         .container {
-            max-width: 800px;
+            max-width: 900px;
             margin: 0 auto;
             background-color: #fff;
             padding: 30px;
-            border-radius: 8px;
-            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            border-radius: 12px;
+            box-shadow: 0 6px 12px rgba(0,0,0,0.15);
+            border: 2px solid #e0c26c; /* Golden border */
         }
 
-        /* Form styling */
-        #input-form {
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
+        h1 {
+            text-align: center;
+            color: #b8860b; /* Dark golden color */
+            font-family: 'Georgia', serif;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.2);
+            margin-bottom: 25px;
         }
-        .form-group {
-            display: flex;
-            flex-direction: column;
+        
+        /* --- Form Styling --- */
+        #input-form table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
         }
-        label {
-            margin-bottom: 5px;
-            font-weight: bold;
-            color: #555;
-        }
-        input {
+        #input-form th, #input-form td {
             padding: 10px;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-            font-size: 16px;
+            border: 1px solid #e0e0e0;
+            text-align: left;
         }
-        button {
-            padding: 12px 20px;
-            background-color: #007bff;
+        #input-form th {
+            background-color: #f0f0f0;
+            font-weight: bold;
+        }
+        #input-form input {
+            width: 100%;
+            padding: 8px;
+            box-sizing: border-box;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+        #generate-btn {
+            display: block;
+            width: 50%;
+            margin: 20px auto 0;
+            padding: 15px;
+            background-color: #b8860b;
             color: white;
             border: none;
-            border-radius: 4px;
+            border-radius: 8px;
+            font-size: 18px;
             cursor: pointer;
-            font-size: 16px;
-            font-weight: bold;
-            transition: background-color 0.3s ease;
+            transition: background-color 0.3s ease, transform 0.2s;
         }
-        button:hover {
-            background-color: #0056b3;
+        #generate-btn:hover {
+            background-color: #926f1f;
+            transform: translateY(-2px);
         }
 
-        /* Coupon Styling */
-        .coupon-container {
-            margin-top: 40px;
-            display: grid;
-            gap: 30px;
-            /* Hide by default until generated */
+        /* --- Coupon Styling for Display and Print --- */
+        #coupon-display {
             display: none;
         }
-        .coupon {
-            border: 2px dashed #007bff;
+        
+        .coupon-page {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr); /* 2 coupons per row */
+            gap: 20px;
             padding: 20px;
-            border-radius: 8px;
-            background-color: #f8faff;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
+            margin: 0 auto;
+        }
+        
+        .coupon-page h2 {
+            grid-column: 1 / -1; /* Span across both columns */
             text-align: center;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            font-size: 24px;
+            color: #444;
+            margin-bottom: 20px;
         }
+
+        .coupon {
+            border: 2px solid #b8860b;
+            border-radius: 10px;
+            padding: 15px;
+            text-align: center;
+            background-color: #fff;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .coupon::before {
+            content: "Golden Jubilee";
+            position: absolute;
+            top: 10px;
+            left: -30px;
+            transform: rotate(-45deg);
+            font-size: 12px;
+            font-weight: bold;
+            color: #fff;
+            background-color: #b8860b;
+            padding: 2px 30px;
+        }
+
         .coupon h3 {
-            margin: 0 0 10px;
-            color: #333;
+            margin: 5px 0 10px;
+            color: #b8860b;
+            font-size: 20px;
         }
+
         .coupon p {
             margin: 5px 0;
             font-size: 14px;
-            color: #666;
+            color: #555;
         }
+
         .coupon .highlight {
-            font-size: 24px;
+            font-size: 28px;
             font-weight: bold;
-            color: #dc3545;
+            color: #dc3545; /* Red for emphasis */
             margin-top: 10px;
         }
 
-        /* Specific styles for each coupon type */
-        .caterer-coupon {
-            border-color: #28a745;
-        }
-        .caterer-coupon h3 {
-            color: #28a745;
-        }
-        .school-coupon {
-            border-color: #ffc107;
-        }
-        .school-coupon h3 {
-            color: #ffc107;
+        .instruction-box {
+            text-align: center;
+            margin-top: 20px;
+            padding: 15px;
+            background-color: #ffe0b2; /* Light orange for instructions */
+            border-left: 5px solid #ff9800;
+            border-radius: 5px;
         }
 
-        /* Print-specific styles */
+        /* --- Print-Specific Styles (@media print) --- */
         @media print {
             body {
                 background-color: #fff;
+                margin: 0;
             }
             .container {
                 box-shadow: none;
+                border: none;
                 padding: 0;
             }
-            #input-form, #generate-btn, .no-print {
+            h1, #input-form, .no-print {
                 display: none;
             }
-            .coupon-container {
+            .coupon-page {
                 display: flex;
                 flex-direction: column;
-                gap: 20px;
-                page-break-after: always; /* Ensure each coupon is on a new page */
+                justify-content: space-around;
+                height: 100vh;
+                margin: 0;
+                padding: 1cm;
+                box-sizing: border-box;
+                page-break-after: always;
             }
             .coupon {
-                border: 2px solid #000;
+                border: 1px solid #000;
+                border-radius: 0;
                 box-shadow: none;
+                padding: 10px;
+                flex-basis: 18%; /* Adjust to fit 5 per A4 page */
                 page-break-inside: avoid;
             }
-            h1 {
-                display: none; /* Hide the main heading on print */
+            .coupon::before {
+                display: none; /* Hide the ribbon in print */
             }
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>Sishu Mangal Parsat - Coupon Generator</h1>
+        <h1>Sishu Mangal Parsat - Golden Jubilee</h1>
+        <h2>Meal Coupon Generation</h2>
 
         <form id="input-form">
-            <div class="form-group">
-                <label for="school-name">School Name:</label>
-                <input type="text" id="school-name" required>
-            </div>
-            <div class="form-group">
-                <label for="contact-name">Contact Name (Mobile No. Owner):</label>
-                <input type="text" id="contact-name" required>
-            </div>
-            <div class="form-group">
-                <label for="mobile-no">Mobile Number:</label>
-                <input type="tel" id="mobile-no" required>
-            </div>
-            <div class="form-group">
-                <label for="meal-count">Number of Meal Coupons Issued:</label>
-                <input type="number" id="meal-count" min="1" required>
-            </div>
-            <button type="submit" id="generate-btn">Generate Coupons</button>
+            <table>
+                <thead>
+                    <tr>
+                        <th>School Name</th>
+                        <th>Contact Name</th>
+                        <th>Mobile Number</th>
+                        <th>No. of Meals</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    </tbody>
+            </table>
+            <button type="submit" id="generate-btn">Generate and Prepare for Print</button>
         </form>
 
-        <div class="coupon-container" id="coupon-display">
-            <div class="coupon caterer-coupon">
-                <h3>Caterer's Copy</h3>
-                <p><strong>School Name:</strong> <span id="caterer-school"></span></p>
-                <p><strong>Contact Person:</strong> <span id="caterer-contact"></span></p>
-                <p><strong>Mobile No:</strong> <span id="caterer-mobile"></span></p>
-                <p><strong>Number of Meals:</strong> <span id="caterer-meals" class="highlight"></span></p>
+        <div id="coupon-display">
+            <div class="coupon-page" id="caterer-page">
+                <h2>Caterer's Copies</h2>
+            </div>
+            
+            <div class="coupon-page" id="school-page">
+                <h2>School's Copies</h2>
             </div>
 
-            <div class="coupon school-coupon">
-                <h3>School's Copy</h3>
-                <p><strong>School Name:</strong> <span id="school-school"></span></p>
-                <p><strong>Contact Person:</strong> <span id="school-contact"></span></p>
-                <p><strong>Mobile No:</strong> <span id="school-mobile"></span></p>
-                <p><strong>Number of Meals:</strong> <span id="school-meals" class="highlight"></span></p>
+            <div class="instruction-box no-print">
+                <p><strong>Instructions for Printing:</strong></p>
+                <ol>
+                    <li>Click the "Print" button below.</li>
+                    <li>In the print dialog, print the first page which contains all the **Caterer's Copies**.</li>
+                    <li>Flip the printed paper over.</li>
+                    <li>Print the second page which contains all the **School's Copies**.</li>
+                    <li>Make sure your printer settings are set to **"Fit to Page"** or **"Scale: 100%"**.</li>
+                </ol>
             </div>
             
             <button class="no-print" onclick="window.print()">Print Coupons</button>
@@ -184,29 +229,67 @@
     </div>
 
     <script>
+        // Dynamically create 5 rows for the input table
+        const tbody = document.querySelector('#input-form tbody');
+        for (let i = 0; i < 5; i++) {
+            const row = document.createElement('tr');
+            row.innerHTML = `
+                <td><input type="text" name="schoolName" required></td>
+                <td><input type="text" name="contactName" required></td>
+                <td><input type="tel" name="mobileNo" required></td>
+                <td><input type="number" name="mealCount" min="1" required></td>
+            `;
+            tbody.appendChild(row);
+        }
+
         document.getElementById('input-form').addEventListener('submit', function(event) {
-            event.preventDefault(); // Prevents the form from submitting and refreshing the page
+            event.preventDefault();
 
-            // Get values from the form
-            const schoolName = document.getElementById('school-name').value;
-            const contactName = document.getElementById('contact-name').value;
-            const mobileNo = document.getElementById('mobile-no').value;
-            const mealCount = document.getElementById('meal-count').value;
+            const formRows = document.querySelectorAll('#input-form tbody tr');
+            const catererPage = document.getElementById('caterer-page');
+            const schoolPage = document.getElementById('school-page');
 
-            // Update the Caterer's Coupon
-            document.getElementById('caterer-school').textContent = schoolName;
-            document.getElementById('caterer-contact').textContent = contactName;
-            document.getElementById('caterer-mobile').textContent = mobileNo;
-            document.getElementById('caterer-meals').textContent = mealCount;
+            // Clear previous coupons
+            catererPage.innerHTML = '<h2>Caterer\'s Copies</h2>';
+            schoolPage.innerHTML = '<h2>School\'s Copies</h2>';
 
-            // Update the School's Coupon
-            document.getElementById('school-school').textContent = schoolName;
-            document.getElementById('school-contact').textContent = contactName;
-            document.getElementById('school-mobile').textContent = mobileNo;
-            document.getElementById('school-meals').textContent = mealCount;
+            formRows.forEach(row => {
+                const inputs = row.querySelectorAll('input');
+                const schoolName = inputs[0].value;
+                const contactName = inputs[1].value;
+                const mobileNo = inputs[2].value;
+                const mealCount = inputs[3].value;
 
-            // Show the coupons and the print button
-            document.getElementById('coupon-display').style.display = 'grid';
+                if (schoolName && contactName && mobileNo && mealCount) {
+                    // Create Caterer Coupon HTML
+                    const catererCouponHtml = `
+                        <div class="coupon">
+                            <h3>Caterer's Copy</h3>
+                            <p><strong>School:</strong> ${schoolName}</p>
+                            <p><strong>Contact:</strong> ${contactName}</p>
+                            <p><strong>Mobile:</strong> ${mobileNo}</p>
+                            <p><strong>Meals:</strong> <span class="highlight">${mealCount}</span></p>
+                        </div>
+                    `;
+                    
+                    // Create School Coupon HTML
+                    const schoolCouponHtml = `
+                        <div class="coupon">
+                            <h3>School's Copy</h3>
+                            <p><strong>School:</strong> ${schoolName}</p>
+                            <p><strong>Contact:</strong> ${contactName}</p>
+                            <p><strong>Mobile:</strong> ${mobileNo}</p>
+                            <p><strong>Meals:</strong> <span class="highlight">${mealCount}</span></p>
+                        </div>
+                    `;
+
+                    catererPage.innerHTML += catererCouponHtml;
+                    schoolPage.innerHTML += schoolCouponHtml;
+                }
+            });
+
+            // Show the coupon pages and instruction box
+            document.getElementById('coupon-display').style.display = 'block';
         });
     </script>
 </body>
