@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Golden Jubilee Meal Coupon</title>
+    <title>Golden Jubilee Coupon Generator</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <style>
         /* General Body and Container Styling */
@@ -151,20 +151,6 @@
             font-size: 0.8em;
             flex-shrink: 0;
         }
-        .coupon-footer {
-            position: absolute;
-            bottom: 5px;
-            left: 0;
-            right: 0;
-            font-size: 0.6em;
-            color: #ccc;
-            text-align: center;
-            padding: 0 5px;
-        }
-        .coupon-footer span {
-            display: block;
-            margin-top: 2px;
-        }
 
         /* Placeholder for the generated image */
         #generated-image-display {
@@ -212,7 +198,6 @@
             #coupon-template .highlight { font-size: 2.5em; }
             #coupon-template .meal-counts { gap: 40px; }
             #coupon-template .meal-counts div { font-size: 1.2em; padding: 15px 20px; }
-            #coupon-template .coupon-footer { color: #555; font-size: 0.8em; bottom: 20px;}
         }
     </style>
 </head>
@@ -287,10 +272,6 @@
             </div>
             <p style="margin-top: 20px; font-size: 0.8em;">Please present this coupon to receive your meals.</p>
         </div>
-        <div class="coupon-footer">
-            Krishnanagar, Nadia, West Bengal, India
-            <span>Generated: <span id="generation-date"></span></span>
-        </div>
     </div>
 
     <div id="generated-image-display" class="no-print">
@@ -312,7 +293,6 @@
         const couponTemplate = document.getElementById('coupon-template');
         const generatedImageDisplay = document.getElementById('generated-image-display');
         const couponImageElement = document.getElementById('coupon-image');
-        const generationDateElement = document.getElementById('generation-date');
 
         function updateCouponTemplate() {
             for (const field in formInputs) {
@@ -321,15 +301,6 @@
                     el.textContent = formInputs[field].value;
                 });
             }
-            const now = new Date();
-            generationDateElement.textContent = now.toLocaleDateString('en-IN', {
-                year: 'numeric',
-                month: 'long',
-                day: 'numeric'
-            }) + ' ' + now.toLocaleTimeString('en-IN', {
-                hour: '2-digit',
-                minute: '2-digit'
-            });
         }
 
         document.getElementById('generate-print-btn').addEventListener('click', function(event) {
