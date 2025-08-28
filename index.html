@@ -79,6 +79,7 @@
             font-size: 16px;
             font-weight: bold;
             transition: background-color 0.3s ease;
+            flex-grow: 1; /* Make buttons take equal width */
         }
         button:hover {
             background-color: #0056b3;
@@ -90,77 +91,135 @@
             background-color: #128c7e;
         }
         
-        /* The Coupon (Hidden by default) */
-        .coupon-container {
-            display: none;
-            margin-top: 40px;
-            border: 2px solid #ffcc00;
-            border-radius: 10px;
-            padding: 30px;
+        /* The Coupon (Initially hidden, designed for image generation) */
+        /* This container is where html2canvas will take its screenshot */
+        #coupon-template {
+            display: block; /* Always displayed for html2canvas to capture */
+            width: 400px; /* Fixed width for square image */
+            height: 400px; /* Fixed height for square image */
+            margin: 0 auto; /* Center it */
+            border: 4px solid #ffcc00;
+            border-radius: 15px;
+            padding: 20px;
             background-color: #fff8e1;
-            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            box-shadow: 0 8px 16px rgba(0,0,0,0.2);
             text-align: center;
+            box-sizing: border-box; /* Include padding and border in width/height */
+            overflow: hidden; /* Ensure content stays within square */
+            position: relative; /* For absolute positioning of elements */
         }
-        .coupon-container .header {
+        #coupon-template .header {
             border-bottom: none;
+            margin-bottom: 15px;
+            padding-bottom: 0;
+        }
+        #coupon-template .header h1 {
+            font-size: 1.8em;
+            margin-bottom: 0;
+        }
+        #coupon-template .header p {
+            font-size: 0.9em;
+            margin-top: 5px;
         }
         .coupon-body {
-            margin-top: 20px;
+            margin-top: 10px;
         }
         .coupon-body p {
-            margin: 10px 0;
-            font-size: 1.1em;
+            margin: 5px 0;
+            font-size: 0.9em;
         }
         .coupon-body strong {
             color: #333;
         }
         .highlight {
-            font-size: 1.8em;
+            font-size: 1.5em;
             font-weight: bold;
             color: #dc3545;
             display: block;
-            margin-top: 5px;
+            margin-top: 3px;
         }
         .meal-counts {
             display: flex;
             justify-content: center;
-            gap: 30px;
-            margin-top: 20px;
+            gap: 15px;
+            margin-top: 15px;
         }
         .meal-counts div {
             border: 1px solid #ddd;
-            padding: 10px 15px;
-            border-radius: 8px;
+            padding: 8px 12px;
+            border-radius: 6px;
             background-color: #f9f9f9;
+            font-size: 0.8em;
+            flex-shrink: 0;
+        }
+        .coupon-footer {
+            position: absolute;
+            bottom: 15px;
+            left: 0;
+            right: 0;
+            font-size: 0.75em;
+            color: #666;
+            text-align: center;
+        }
+        .coupon-footer span {
+            display: block;
+            margin-top: 3px;
         }
 
-        /* Instructions for after image generation */
-        #instructions {
-            display: none;
+        /* Placeholder for the generated image */
+        #generated-image-display {
+            display: none; /* Hidden until an image is generated */
+            margin-top: 30px;
             text-align: center;
-            margin-top: 20px;
-            font-weight: bold;
-            color: #555;
+            border: 1px solid #ddd;
+            padding: 20px;
+            border-radius: 8px;
+            background-color: #fff;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
         }
+        #generated-image-display img {
+            max-width: 100%;
+            height: auto;
+            border: 2px solid #ffcc00;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+        #copy-instructions {
+            margin-top: 15px;
+            font-weight: bold;
+            color: #007bff;
+        }
+
 
         /* Print-specific styles */
         @media print {
             body {
                 background-color: white;
             }
-            .container, .no-print, #instructions {
+            .container, .no-print, #generated-image-display {
                 display: none;
             }
-            .coupon-container {
+            /* The coupon template will be used for printing as well */
+            #coupon-template {
                 display: block;
-                border: 2px solid #000;
-                box-shadow: none;
                 width: 21cm; /* A4 width */
                 height: 29.7cm; /* A4 height */
                 margin: 0;
                 padding: 1cm;
                 box-sizing: border-box;
+                border: none; /* No border for print */
+                box-shadow: none; /* No shadow for print */
+                border-radius: 0;
+                background-color: white; /* Print on white background */
             }
+            /* Adjust coupon template content for A4 print */
+            #coupon-template .header h1 { font-size: 3em; }
+            #coupon-template .header p { font-size: 1.5em; }
+            #coupon-template .coupon-body p { font-size: 1.5em; }
+            #coupon-template .highlight { font-size: 2.5em; }
+            #coupon-template .meal-counts { gap: 40px; }
+            #coupon-template .meal-counts div { font-size: 1.2em; padding: 15px 20px; }
+            #coupon-template .coupon-footer { font-size: 1em; bottom: 20px;}
         }
     </style>
 </head>
@@ -173,7 +232,7 @@
         </div>
         
         <h2>Meal Coupon Generator</h2>
-        <p>Fill in the details below to generate a printable coupon or a photo for WhatsApp.</p>
+        <p>Fill in the details below to generate a printable coupon or an image for WhatsApp.</p>
 
         <form id="input-form">
             <div class="form-group">
@@ -209,79 +268,93 @@
         </form>
     </div>
 
-    <div class="coupon-container" id="coupon-display">
+    <div id="coupon-template" style="position: absolute; left: -9999px; top: -9999px;">
         <div class="header">
             <h1>Sishu Mangal Parsat</h1>
             <p>Golden Jubilee Celebration</p>
         </div>
         <div class="coupon-body">
             <p>This coupon is for:</p>
-            <p><strong>School Name:</strong> <span id="coupon-school-name"></span></p>
-            <p><strong>Contact Person:</strong> <span id="coupon-contact-name"></span></p>
-            <p><strong>Mobile No:</strong> <span id="coupon-mobile-no"></span></p>
+            <p><strong>School Name:</strong> <span class="coupon-data" data-field="school-name"></span></p>
+            <p><strong>Contact Person:</strong> <span class="coupon-data" data-field="contact-name"></span></p>
+            <p><strong>Mobile No:</strong> <span class="coupon-data" data-field="mobile-no"></span></p>
             <div class="meal-counts">
                 <div>
                     <p>Breakfast</p>
-                    <span id="coupon-breakfast" class="highlight">0</span>
+                    <span class="coupon-data highlight" data-field="breakfast-count">0</span>
                 </div>
                 <div>
                     <p>Lunch</p>
-                    <span id="coupon-lunch" class="highlight">0</span>
+                    <span class="coupon-data highlight" data-field="lunch-count">0</span>
                 </div>
                 <div>
                     <p>Dinner</p>
-                    <span id="coupon-dinner" class="highlight">0</span>
+                    <span class="coupon-data highlight" data-field="dinner-count">0</span>
                 </div>
             </div>
-            <p style="margin-top: 30px; font-size: 0.9em;">Please present this coupon to receive your meals.</p>
+            <p style="margin-top: 20px; font-size: 0.8em;">Please present this coupon to receive your meals.</p>
+        </div>
+        <div class="coupon-footer">
+            Krishnanagar, Nadia, West Bengal, India
+            <span>Generated: <span id="generation-date"></span></span>
         </div>
     </div>
+
+    <div id="generated-image-display" class="no-print">
+        <h3>Generated Coupon Image:</h3>
+        <img id="coupon-image" src="" alt="Generated Meal Coupon">
+        <p id="copy-instructions">Right-click (or long-press on mobile) the image above to copy it and paste into WhatsApp.</p>
+    </div>
     
-    <p id="instructions" class="no-print">The image has been downloaded! You can now find it in your phone's gallery or downloads folder to share on WhatsApp.</p>
-
     <script>
-        const schoolNameInput = document.getElementById('school-name');
-        const contactNameInput = document.getElementById('contact-name');
-        const mobileNoInput = document.getElementById('mobile-no');
-        const breakfastInput = document.getElementById('breakfast-count');
-        const lunchInput = document.getElementById('lunch-count');
-        const dinnerInput = document.getElementById('dinner-count');
+        const formInputs = {
+            'school-name': document.getElementById('school-name'),
+            'contact-name': document.getElementById('contact-name'),
+            'mobile-no': document.getElementById('mobile-no'),
+            'breakfast-count': document.getElementById('breakfast-count'),
+            'lunch-count': document.getElementById('lunch-count'),
+            'dinner-count': document.getElementById('dinner-count')
+        };
 
-        const couponDisplay = document.getElementById('coupon-display');
-        const couponSchoolName = document.getElementById('coupon-school-name');
-        const couponContactName = document.getElementById('coupon-contact-name');
-        const couponMobileNo = document.getElementById('coupon-mobile-no');
-        const couponBreakfast = document.getElementById('coupon-breakfast');
-        const couponLunch = document.getElementById('coupon-lunch');
-        const couponDinner = document.getElementById('coupon-dinner');
-        const instructions = document.getElementById('instructions');
+        const couponTemplate = document.getElementById('coupon-template');
+        const generatedImageDisplay = document.getElementById('generated-image-display');
+        const couponImageElement = document.getElementById('coupon-image');
+        const generationDateElement = document.getElementById('generation-date');
 
-        // Function to update the coupon on the page
-        function updateCoupon() {
-            const schoolName = schoolNameInput.value;
-            const contactName = contactNameInput.value;
-            const mobileNo = mobileNoInput.value;
-            const breakfastCount = breakfastInput.value;
-            const lunchCount = lunchInput.value;
-            const dinnerCount = dinnerInput.value;
-
-            couponSchoolName.textContent = schoolName;
-            couponContactName.textContent = contactName;
-            couponMobileNo.textContent = mobileNo;
-            couponBreakfast.textContent = breakfastCount;
-            couponLunch.textContent = lunchCount;
-            couponDinner.textContent = dinnerCount;
-
-            couponDisplay.style.display = 'block';
-            instructions.style.display = 'none';
+        // Function to update the coupon template with current form data
+        function updateCouponTemplate() {
+            for (const field in formInputs) {
+                const elements = couponTemplate.querySelectorAll(`.coupon-data[data-field="${field}"]`);
+                elements.forEach(el => {
+                    el.textContent = formInputs[field].value;
+                });
+            }
+            const now = new Date();
+            generationDateElement.textContent = now.toLocaleDateString('en-IN', {
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric'
+            }) + ' ' + now.toLocaleTimeString('en-IN', {
+                hour: '2-digit',
+                minute: '2-digit'
+            });
         }
 
         // Generate & Print button
         document.getElementById('generate-print-btn').addEventListener('click', function(event) {
             event.preventDefault();
             if (document.getElementById('input-form').checkValidity()) {
-                updateCoupon();
+                updateCouponTemplate();
+                // Temporarily make the template visible for printing purposes only
+                couponTemplate.style.position = 'static';
+                couponTemplate.style.left = 'auto';
+                couponTemplate.style.top = 'auto';
                 window.print();
+                // Hide it again after printing
+                couponTemplate.style.position = 'absolute';
+                couponTemplate.style.left = '-9999px';
+                couponTemplate.style.top = '-9999px';
+                generatedImageDisplay.style.display = 'none'; // Hide image display if printing
             } else {
                 alert('Please fill out all required fields.');
             }
@@ -291,29 +364,29 @@
         document.getElementById('generate-image-btn').addEventListener('click', function(event) {
             event.preventDefault();
             if (document.getElementById('input-form').checkValidity()) {
-                updateCoupon();
+                updateCouponTemplate();
 
-                // Wait for the coupon to render before taking a screenshot
+                // Temporarily make the coupon template visible for html2canvas
+                couponTemplate.style.position = 'static';
+                couponTemplate.style.left = 'auto';
+                couponTemplate.style.top = 'auto';
+                
+                // Use a small timeout to ensure DOM has updated before screenshot
                 setTimeout(() => {
-                    html2canvas(couponDisplay, { 
-                        scale: 2, // Increase resolution for better quality
+                    html2canvas(couponTemplate, { 
+                        scale: 3, // Increase resolution for better quality
                         backgroundColor: '#fff8e1' // Ensure background is captured
                     }).then(canvas => {
                         const imageData = canvas.toDataURL('image/png');
+                        couponImageElement.src = imageData;
+                        generatedImageDisplay.style.display = 'block';
                         
-                        // Create a temporary link to trigger the download
-                        const link = document.createElement('a');
-                        link.href = imageData;
-                        link.download = `Sishu_Mangal_Parsat_Coupon.png`;
-                        
-                        document.body.appendChild(link);
-                        link.click();
-                        document.body.removeChild(link);
-
-                        // Show instructions to the user
-                        instructions.style.display = 'block';
+                        // Hide the coupon template again
+                        couponTemplate.style.position = 'absolute';
+                        couponTemplate.style.left = '-9999px';
+                        couponTemplate.style.top = '-9999px';
                     });
-                }, 50); // A small delay to ensure the DOM has updated
+                }, 50); 
             } else {
                 alert('Please fill out all required fields.');
             }
