@@ -1,3 +1,221 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Golden Jubilee Meal Coupon</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <style>
+        /* General Body and Container Styling */
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f4f4f9;
+            color: #333;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background-color: #fff;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+
+        /* Header and Golden Jubilee Styling */
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            border-bottom: 2px solid #ffcc00;
+            padding-bottom: 10px;
+        }
+        .header h1 {
+            color: #004d99;
+            margin: 0;
+            font-size: 2.5em;
+        }
+        .header p {
+            margin: 5px 0 0;
+            color: #e6b800;
+            font-size: 1.2em;
+            font-weight: bold;
+        }
+
+        /* Input Form Styling */
+        #input-form {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+        label {
+            font-weight: bold;
+            color: #555;
+            margin-bottom: 5px;
+        }
+        input {
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-size: 16px;
+        }
+        .button-group {
+            display: flex;
+            gap: 10px;
+            margin-top: 10px;
+        }
+        button {
+            padding: 12px 20px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: bold;
+            transition: background-color 0.3s ease;
+            flex-grow: 1;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        #generate-image-btn {
+            background-color: #25d366;
+        }
+        #generate-image-btn:hover {
+            background-color: #128c7e;
+        }
+        
+        /* The Coupon (for image generation) */
+        #coupon-template {
+            display: block;
+            width: 400px;
+            height: 400px;
+            margin: 0 auto;
+            border: 4px solid #ffcc00;
+            border-radius: 15px;
+            padding: 20px;
+            background-color: #fff8e1;
+            box-shadow: 0 8px 16px rgba(0,0,0,0.2);
+            text-align: center;
+            box-sizing: border-box;
+            overflow: hidden;
+            position: relative;
+        }
+        #coupon-template .header {
+            border-bottom: none;
+            margin-bottom: 15px;
+            padding-bottom: 0;
+        }
+        #coupon-template .header h1 {
+            font-size: 1.8em;
+            margin-bottom: 0;
+        }
+        #coupon-template .header p {
+            font-size: 0.9em;
+            margin-top: 5px;
+        }
+        .coupon-body {
+            margin-top: 10px;
+        }
+        .coupon-body p {
+            margin: 5px 0;
+            font-size: 0.9em;
+        }
+        .coupon-body strong {
+            color: #333;
+        }
+        .highlight {
+            font-size: 1.5em;
+            font-weight: bold;
+            color: #dc3545;
+            display: block;
+            margin-top: 3px;
+        }
+        .meal-counts {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-top: 15px;
+        }
+        .meal-counts div {
+            border: 1px solid #ddd;
+            padding: 8px 12px;
+            border-radius: 6px;
+            background-color: #f9f9f9;
+            font-size: 0.8em;
+            flex-shrink: 0;
+        }
+        .coupon-footer {
+            position: absolute;
+            bottom: 5px;
+            left: 0;
+            right: 0;
+            font-size: 0.6em;
+            color: #ccc;
+            text-align: center;
+            padding: 0 5px;
+        }
+        .coupon-footer span {
+            display: block;
+            margin-top: 2px;
+        }
+
+        /* Placeholder for the generated image */
+        #generated-image-display {
+            display: none;
+            margin-top: 30px;
+            text-align: center;
+            border: 1px solid #ddd;
+            padding: 20px;
+            border-radius: 8px;
+            background-color: #fff;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+        #generated-image-display img {
+            max-width: 100%;
+            height: auto;
+            border: 2px solid #ffcc00;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+        #copy-instructions {
+            margin-top: 15px;
+            font-weight: bold;
+            color: #007bff;
+        }
+
+        /* Print-specific styles */
+        @media print {
+            body { background-color: white; }
+            .container, .no-print, #generated-image-display { display: none; }
+            #coupon-template {
+                display: block;
+                width: 21cm;
+                height: 29.7cm;
+                margin: 0;
+                padding: 1cm;
+                box-sizing: border-box;
+                border: none;
+                box-shadow: none;
+                border-radius: 0;
+                background-color: white;
+            }
+            #coupon-template .header h1 { font-size: 3em; }
+            #coupon-template .header p { font-size: 1.5em; }
+            #coupon-template .coupon-body p { font-size: 1.5em; }
+            #coupon-template .highlight { font-size: 2.5em; }
+            #coupon-template .meal-counts { gap: 40px; }
+            #coupon-template .meal-counts div { font-size: 1.2em; padding: 15px 20px; }
+            #coupon-template .coupon-footer { color: #555; font-size: 0.8em; bottom: 20px;}
+        }
+    </style>
+</head>
 <body>
 
     <div class="container no-print">
@@ -32,7 +250,7 @@
                 <input type="number" id="lunch-count" min="0" value="0">
             </div>
             <div class="form-group">
-                <label for="dinner-count">Number of Tiffins:</label>
+                <label for="dinner-count">Number of Dinners:</label>
                 <input type="number" id="dinner-count" min="0" value="0">
             </div>
 
@@ -63,15 +281,15 @@
                     <span class="coupon-data highlight" data-field="lunch-count">0</span>
                 </div>
                 <div>
-                    <p>Tiffin</p>
+                    <p>Dinner</p>
                     <span class="coupon-data highlight" data-field="dinner-count">0</span>
                 </div>
             </div>
             <p style="margin-top: 20px; font-size: 0.8em;">Please present this coupon to receive your meals.</p>
         </div>
         <div class="coupon-footer">
-            <p>Generated on: <span id="generation-date"></span></p>
-            <span>&copy; Sishu Mangal Parsat</span>
+            Krishnanagar, Nadia, West Bengal, India
+            <span>Generated: <span id="generation-date"></span></span>
         </div>
     </div>
 
@@ -94,10 +312,8 @@
         const couponTemplate = document.getElementById('coupon-template');
         const generatedImageDisplay = document.getElementById('generated-image-display');
         const couponImageElement = document.getElementById('coupon-image');
-        // Add this line to define the generationDateElement
         const generationDateElement = document.getElementById('generation-date');
 
-        // Function to update the coupon template with current form data
         function updateCouponTemplate() {
             for (const field in formInputs) {
                 const elements = couponTemplate.querySelectorAll(`.coupon-data[data-field="${field}"]`);
@@ -116,48 +332,40 @@
             });
         }
 
-        // Generate & Print button
         document.getElementById('generate-print-btn').addEventListener('click', function(event) {
             event.preventDefault();
             if (document.getElementById('input-form').checkValidity()) {
                 updateCouponTemplate();
-                // Temporarily make the template visible for printing purposes only
                 couponTemplate.style.position = 'static';
                 couponTemplate.style.left = 'auto';
                 couponTemplate.style.top = 'auto';
                 window.print();
-                // Hide it again after printing
                 couponTemplate.style.position = 'absolute';
                 couponTemplate.style.left = '-9999px';
                 couponTemplate.style.top = '-9999px';
-                generatedImageDisplay.style.display = 'none'; // Hide image display if printing
+                generatedImageDisplay.style.display = 'none';
             } else {
                 alert('Please fill out all required fields.');
             }
         });
 
-        // Generate Image button
         document.getElementById('generate-image-btn').addEventListener('click', function(event) {
             event.preventDefault();
             if (document.getElementById('input-form').checkValidity()) {
                 updateCouponTemplate();
-
-                // Temporarily make the coupon template visible for html2canvas
                 couponTemplate.style.position = 'static';
                 couponTemplate.style.left = 'auto';
                 couponTemplate.style.top = 'auto';
                 
-                // Use a small timeout to ensure DOM has updated before screenshot
                 setTimeout(() => {
                     html2canvas(couponTemplate, { 
-                        scale: 3, // Increase resolution for better quality
-                        backgroundColor: '#fff8e1' // Ensure background is captured
+                        scale: 3,
+                        backgroundColor: '#fff8e1'
                     }).then(canvas => {
                         const imageData = canvas.toDataURL('image/png');
                         couponImageElement.src = imageData;
                         generatedImageDisplay.style.display = 'block';
                         
-                        // Hide the coupon template again
                         couponTemplate.style.position = 'absolute';
                         couponTemplate.style.left = '-9999px';
                         couponTemplate.style.top = '-9999px';
@@ -167,7 +375,6 @@
                 alert('Please fill out all required fields.');
             }
         });
-
     </script>
 </body>
 </html>
