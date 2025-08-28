@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Golden Jubilee Coupon Generator</title>
+    <title>Golden Jubilee Meal Coupon</title>
     <style>
         /* General Body and Container Styling */
         body {
@@ -88,9 +88,6 @@
         button:hover {
             background-color: #0056b3;
         }
-        .no-print {
-            margin-top: 20px;
-        }
         
         /* Coupon and A4 Layout for Printing */
         .print-area {
@@ -98,56 +95,59 @@
         }
         .coupon-page {
             display: flex;
+            flex-wrap: wrap; /* Allows columns to wrap */
+            justify-content: space-around;
             width: 21cm; /* A4 width */
-            height: 29.7cm; /* A4 height */
             margin: 0 auto;
         }
-        .caterer-side, .school-side {
-            width: 50%;
+        .coupon-column {
+            width: 48%; /* Slightly less than 50% to account for margins */
             display: flex;
             flex-direction: column;
-            justify-content: space-around;
-            padding: 10px;
-            box-sizing: border-box;
+            gap: 10px;
+        }
+        .coupon-column h3 {
+            text-align: center;
+            margin-top: 0;
+            color: #004d99;
         }
 
         /* Coupon Styling */
         .coupon {
             width: 100%;
-            height: 150px;
+            height: 120px; /* Reduced height to fit 6 per column */
             border: 2px dashed #333;
-            padding: 10px;
+            padding: 8px;
             border-radius: 5px;
             box-sizing: border-box;
             background-color: #fafafa;
-            margin: 5px 0;
             text-align: center;
             display: flex;
             flex-direction: column;
             justify-content: center;
         }
-        .coupon-header {
-            font-weight: bold;
-            font-size: 1.1em;
-            color: #004d99;
-            margin-bottom: 5px;
-        }
         .coupon-title {
+            font-weight: bold;
             font-size: 0.9em;
+            color: #004d99;
+            margin-bottom: 3px;
+        }
+        .coupon-subtitle {
+            font-size: 0.7em;
             color: #e6b800;
         }
         .coupon-details p {
-            margin: 3px 0;
-            font-size: 0.8em;
+            margin: 2px 0;
+            font-size: 0.75em;
         }
         .coupon-details strong {
             color: #333;
         }
         .highlight {
-            font-size: 1.5em;
+            font-size: 1.2em;
             font-weight: bold;
             color: #dc3545;
-            margin-top: 5px;
+            margin-top: 3px;
         }
 
         /* Print-specific styles */
@@ -164,10 +164,17 @@
             }
             .coupon-page {
                 border: none;
+                width: 21cm;
+                height: 29.7cm; /* A4 size */
+                padding: 1cm; /* Optional padding for better margins */
+                box-sizing: border-box;
+            }
+            .coupon-column {
+                break-inside: avoid; /* Prevents columns from breaking across pages */
             }
             .coupon {
                 border: 1px solid #000;
-                page-break-inside: avoid;
+                page-break-inside: avoid; /* Prevents coupons from splitting */
             }
         }
     </style>
@@ -181,7 +188,7 @@
         </div>
         
         <h2>Coupon Generator</h2>
-        <p>Fill in the details for up to 6 schools. When you generate, a printable A4 page will appear with caterer's copies on one side and school's copies on the other.</p>
+        <p>Fill in the details for up to 6 schools. When you generate, a single printable A4 page will appear with all 12 coupons.</p>
 
         <form id="input-form">
             <div class="school-entry">
@@ -224,7 +231,7 @@
                 <div class="form-group"><label>School Name:</label><input type="text" class="school-name"></div>
                 <div class="form-group"><label>Contact Name:</label><input type="text" class="contact-name"></div>
                 <div class="form-group"><label>Mobile Number:</label><input type="tel" class="mobile-no"></div>
-                <div class="form-group"><label><label>Number of Meals:</label></label><input type="number" class="meal-count" min="1"></div>
+                <div class="form-group"><label>Number of Meals:</label><input type="number" class="meal-count" min="1"></div>
             </div>
 
             <button type="submit" id="generate-btn">Generate and Print Coupons</button>
@@ -233,13 +240,13 @@
 
     <div class="print-area">
         <div class="coupon-page">
-            <div class="caterer-side" id="caterer-side">
-                <div class="coupon-header">Caterer's Copy</div>
-                </div>
+            <div class="coupon-column" id="school-column">
+                <h3>School's Copy</h3>
+            </div>
 
-            <div class="school-side" id="school-side">
-                <div class="coupon-header">School's Copy</div>
-                </div>
+            <div class="coupon-column" id="caterer-column">
+                <h3>Caterer's Copy</h3>
+            </div>
         </div>
     </div>
     
@@ -247,13 +254,13 @@
         document.getElementById('input-form').addEventListener('submit', function(event) {
             event.preventDefault();
 
-            // Select the containers for the coupons
-            const catererSide = document.getElementById('caterer-side');
-            const schoolSide = document.getElementById('school-side');
+            // Select the columns for the coupons
+            const schoolColumn = document.getElementById('school-column');
+            const catererColumn = document.getElementById('caterer-column');
             
-            // Clear any previous coupons
-            catererSide.innerHTML = '<div class="coupon-header">Caterer\'s Copy</div>';
-            schoolSide.innerHTML = '<div class="coupon-header">School\'s Copy</div>';
+            // Clear any previous coupons, but keep the header
+            schoolColumn.innerHTML = '<h3>School\'s Copy</h3>';
+            catererColumn.innerHTML = '<h3>Caterer\'s Copy</h3>';
 
             // Get all input fields
             const schoolNames = document.querySelectorAll('.school-name');
@@ -270,24 +277,11 @@
 
                 // Only generate coupons if at least one field is filled
                 if (schoolName || contactName || mobileNo || mealCount) {
-                    // Create Caterer's Coupon
-                    const catererCoupon = `
-                        <div class="coupon">
-                            <div class="coupon-title">Sishu Mangal Parsat - Golden Jubilee</div>
-                            <div class="coupon-details">
-                                <p><strong>School Name:</strong> ${schoolName}</p>
-                                <p><strong>Contact Person:</strong> ${contactName}</p>
-                                <p><strong>Mobile No:</strong> ${mobileNo}</p>
-                                <p><strong>Meals:</strong> <span class="highlight">${mealCount}</span></p>
-                            </div>
-                        </div>
-                    `;
-                    catererSide.innerHTML += catererCoupon;
-
                     // Create School's Coupon
                     const schoolCoupon = `
                         <div class="coupon">
-                            <div class="coupon-title">Sishu Mangal Parsat - Golden Jubilee</div>
+                            <div class="coupon-title">Sishu Mangal Parsat</div>
+                            <div class="coupon-subtitle">Golden Jubilee Celebration</div>
                             <div class="coupon-details">
                                 <p><strong>School Name:</strong> ${schoolName}</p>
                                 <p><strong>Contact Person:</strong> ${contactName}</p>
@@ -296,7 +290,22 @@
                             </div>
                         </div>
                     `;
-                    schoolSide.innerHTML += schoolCoupon;
+                    schoolColumn.innerHTML += schoolCoupon;
+
+                    // Create Caterer's Coupon
+                    const catererCoupon = `
+                        <div class="coupon">
+                            <div class="coupon-title">Sishu Mangal Parsat</div>
+                            <div class="coupon-subtitle">Golden Jubilee Celebration</div>
+                            <div class="coupon-details">
+                                <p><strong>School Name:</strong> ${schoolName}</p>
+                                <p><strong>Contact Person:</strong> ${contactName}</p>
+                                <p><strong>Mobile No:</strong> ${mobileNo}</p>
+                                <p><strong>Meals:</strong> <span class="highlight">${mealCount}</span></p>
+                            </div>
+                        </div>
+                    `;
+                    catererColumn.innerHTML += catererCoupon;
                 }
             }
 
