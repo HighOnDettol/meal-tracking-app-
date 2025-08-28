@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Golden Jubilee Meal Coupon</title>
+    <title>Golden Jubilee Coupon Generator</title>
     <style>
         /* General Body and Container Styling */
         body {
@@ -15,7 +15,7 @@
         }
 
         .container {
-            max-width: 900px;
+            max-width: 600px;
             margin: 0 auto;
             background-color: #fff;
             padding: 30px;
@@ -46,22 +46,11 @@
         #input-form {
             display: flex;
             flex-direction: column;
-            gap: 20px;
-        }
-        .school-entry {
-            border: 1px solid #ddd;
-            padding: 15px;
-            border-radius: 8px;
-            background-color: #fafafa;
-        }
-        .school-entry h4 {
-            margin-top: 0;
-            color: #007bff;
+            gap: 15px;
         }
         .form-group {
             display: flex;
             flex-direction: column;
-            margin-bottom: 10px;
         }
         label {
             font-weight: bold;
@@ -73,6 +62,11 @@
             border: 1px solid #ccc;
             border-radius: 4px;
             font-size: 16px;
+        }
+        .button-group {
+            display: flex;
+            gap: 10px;
+            margin-top: 10px;
         }
         button {
             padding: 12px 20px;
@@ -88,93 +82,74 @@
         button:hover {
             background-color: #0056b3;
         }
-        
-        /* Coupon and A4 Layout for Printing */
-        .print-area {
-            display: none; /* Hidden by default */
+        #whatsapp-btn {
+            background-color: #25d366;
         }
-        .coupon-page {
-            display: flex;
-            flex-wrap: wrap; /* Allows columns to wrap */
-            justify-content: space-around;
-            width: 21cm; /* A4 width */
-            margin: 0 auto;
-        }
-        .coupon-column {
-            width: 48%; /* Slightly less than 50% to account for margins */
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-        }
-        .coupon-column h3 {
-            text-align: center;
-            margin-top: 0;
-            color: #004d99;
+        #whatsapp-btn:hover {
+            background-color: #128c7e;
         }
 
-        /* Coupon Styling */
-        .coupon {
-            width: 100%;
-            height: 120px; /* Reduced height to fit 6 per column */
-            border: 2px dashed #333;
-            padding: 8px;
-            border-radius: 5px;
-            box-sizing: border-box;
-            background-color: #fafafa;
+        /* The Coupon (Initially hidden) */
+        .coupon-container {
+            display: none;
+            margin-top: 40px;
+            border: 2px solid #ffcc00;
+            border-radius: 10px;
+            padding: 30px;
+            background-color: #fff8e1;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
             text-align: center;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
         }
-        .coupon-title {
-            font-weight: bold;
-            font-size: 0.9em;
-            color: #004d99;
-            margin-bottom: 3px;
+        .coupon-container .header {
+            border-bottom: none;
         }
-        .coupon-subtitle {
-            font-size: 0.7em;
-            color: #e6b800;
+        .coupon-body {
+            margin-top: 20px;
         }
-        .coupon-details p {
-            margin: 2px 0;
-            font-size: 0.75em;
+        .coupon-body p {
+            margin: 10px 0;
+            font-size: 1.1em;
         }
-        .coupon-details strong {
+        .coupon-body strong {
             color: #333;
         }
         .highlight {
-            font-size: 1.2em;
+            font-size: 1.8em;
             font-weight: bold;
             color: #dc3545;
-            margin-top: 3px;
+            display: block;
+            margin-top: 5px;
+        }
+        .meal-counts {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            margin-top: 20px;
+        }
+        .meal-counts div {
+            border: 1px solid #ddd;
+            padding: 10px 15px;
+            border-radius: 8px;
+            background-color: #f9f9f9;
         }
 
         /* Print-specific styles */
         @media print {
             body {
-                margin: 0;
-                padding: 0;
+                background-color: white;
             }
-            .container, .no-print, .header {
+            .container, .no-print {
                 display: none;
             }
-            .print-area {
+            .coupon-container {
                 display: block;
-            }
-            .coupon-page {
-                border: none;
-                width: 21cm;
-                height: 29.7cm; /* A4 size */
-                padding: 1cm; /* Optional padding for better margins */
+                border: 2px solid #000;
+                box-shadow: none;
+                width: 21cm; /* A4 width */
+                height: 29.7cm; /* A4 height */
+                margin: 0;
+                padding: 1cm;
                 box-sizing: border-box;
-            }
-            .coupon-column {
-                break-inside: avoid; /* Prevents columns from breaking across pages */
-            }
-            .coupon {
-                border: 1px solid #000;
-                page-break-inside: avoid; /* Prevents coupons from splitting */
             }
         }
     </style>
@@ -187,131 +162,140 @@
             <p>Golden Jubilee Celebration</p>
         </div>
         
-        <h2>Coupon Generator</h2>
-        <p>Fill in the details for up to 6 schools. When you generate, a single printable A4 page will appear with all 12 coupons.</p>
+        <h2>Meal Coupon Generator</h2>
+        <p>Fill in the details below to generate and send a single meal coupon.</p>
 
         <form id="input-form">
-            <div class="school-entry">
-                <h4>School 1</h4>
-                <div class="form-group"><label>School Name:</label><input type="text" class="school-name"></div>
-                <div class="form-group"><label>Contact Name:</label><input type="text" class="contact-name"></div>
-                <div class="form-group"><label>Mobile Number:</label><input type="tel" class="mobile-no"></div>
-                <div class="form-group"><label>Number of Meals:</label><input type="number" class="meal-count" min="1"></div>
+            <div class="form-group">
+                <label for="school-name">School Name:</label>
+                <input type="text" id="school-name" required>
             </div>
-            <div class="school-entry">
-                <h4>School 2</h4>
-                <div class="form-group"><label>School Name:</label><input type="text" class="school-name"></div>
-                <div class="form-group"><label>Contact Name:</label><input type="text" class="contact-name"></div>
-                <div class="form-group"><label>Mobile Number:</label><input type="tel" class="mobile-no"></div>
-                <div class="form-group"><label>Number of Meals:</label><input type="number" class="meal-count" min="1"></div>
+            <div class="form-group">
+                <label for="contact-name">Contact Name (Mobile No. Owner):</label>
+                <input type="text" id="contact-name" required>
             </div>
-            <div class="school-entry">
-                <h4>School 3</h4>
-                <div class="form-group"><label>School Name:</label><input type="text" class="school-name"></div>
-                <div class="form-group"><label>Contact Name:</label><input type="text" class="contact-name"></div>
-                <div class="form-group"><label>Mobile Number:</label><input type="tel" class="mobile-no"></div>
-                <div class="form-group"><label>Number of Meals:</label><input type="number" class="meal-count" min="1"></div>
+            <div class="form-group">
+                <label for="mobile-no">Mobile Number:</label>
+                <input type="tel" id="mobile-no" required>
             </div>
-            <div class="school-entry">
-                <h4>School 4</h4>
-                <div class="form-group"><label>School Name:</label><input type="text" class="school-name"></div>
-                <div class="form-group"><label>Contact Name:</label><input type="text" class="contact-name"></div>
-                <div class="form-group"><label>Mobile Number:</label><input type="tel" class="mobile-no"></div>
-                <div class="form-group"><label>Number of Meals:</label><input type="number" class="meal-count" min="1"></div>
+            
+            <div class="form-group">
+                <label for="breakfast-count">Number of Breakfasts:</label>
+                <input type="number" id="breakfast-count" min="0" value="0">
             </div>
-            <div class="school-entry">
-                <h4>School 5</h4>
-                <div class="form-group"><label>School Name:</label><input type="text" class="school-name"></div>
-                <div class="form-group"><label>Contact Name:</label><input type="text" class="contact-name"></div>
-                <div class="form-group"><label>Mobile Number:</label><input type="tel" class="mobile-no"></div>
-                <div class="form-group"><label>Number of Meals:</label><input type="number" class="meal-count" min="1"></div>
+            <div class="form-group">
+                <label for="lunch-count">Number of Lunches:</label>
+                <input type="number" id="lunch-count" min="0" value="0">
             </div>
-            <div class="school-entry">
-                <h4>School 6</h4>
-                <div class="form-group"><label>School Name:</label><input type="text" class="school-name"></div>
-                <div class="form-group"><label>Contact Name:</label><input type="text" class="contact-name"></div>
-                <div class="form-group"><label>Mobile Number:</label><input type="tel" class="mobile-no"></div>
-                <div class="form-group"><label>Number of Meals:</label><input type="number" class="meal-count" min="1"></div>
+            <div class="form-group">
+                <label for="dinner-count">Number of Dinners:</label>
+                <input type="number" id="dinner-count" min="0" value="0">
             </div>
 
-            <button type="submit" id="generate-btn">Generate and Print Coupons</button>
+            <div class="button-group">
+                <button type="submit" id="generate-print-btn">Generate & Print</button>
+                <button type="button" id="whatsapp-btn">Send via WhatsApp</button>
+            </div>
         </form>
     </div>
 
-    <div class="print-area">
-        <div class="coupon-page">
-            <div class="coupon-column" id="school-column">
-                <h3>School's Copy</h3>
+    <div class="coupon-container" id="coupon-display">
+        <div class="header">
+            <h1>Sishu Mangal Parsat</h1>
+            <p>Golden Jubilee Celebration</p>
+        </div>
+        <div class="coupon-body">
+            <p>This coupon is for:</p>
+            <p><strong>School Name:</strong> <span id="coupon-school-name"></span></p>
+            <p><strong>Contact Person:</strong> <span id="coupon-contact-name"></span></p>
+            <p><strong>Mobile No:</strong> <span id="coupon-mobile-no"></span></p>
+            <div class="meal-counts">
+                <div>
+                    <p>Breakfast</p>
+                    <span id="coupon-breakfast" class="highlight">0</span>
+                </div>
+                <div>
+                    <p>Lunch</p>
+                    <span id="coupon-lunch" class="highlight">0</span>
+                </div>
+                <div>
+                    <p>Dinner</p>
+                    <span id="coupon-dinner" class="highlight">0</span>
+                </div>
             </div>
-
-            <div class="coupon-column" id="caterer-column">
-                <h3>Caterer's Copy</h3>
-            </div>
+            <p style="margin-top: 30px; font-size: 0.9em;">Please present this coupon to receive your meals.</p>
         </div>
     </div>
     
     <script>
-        document.getElementById('input-form').addEventListener('submit', function(event) {
+        const schoolNameInput = document.getElementById('school-name');
+        const contactNameInput = document.getElementById('contact-name');
+        const mobileNoInput = document.getElementById('mobile-no');
+        const breakfastInput = document.getElementById('breakfast-count');
+        const lunchInput = document.getElementById('lunch-count');
+        const dinnerInput = document.getElementById('dinner-count');
+
+        const couponDisplay = document.getElementById('coupon-display');
+        const couponSchoolName = document.getElementById('coupon-school-name');
+        const couponContactName = document.getElementById('coupon-contact-name');
+        const couponMobileNo = document.getElementById('coupon-mobile-no');
+        const couponBreakfast = document.getElementById('coupon-breakfast');
+        const couponLunch = document.getElementById('coupon-lunch');
+        const couponDinner = document.getElementById('coupon-dinner');
+
+        // Function to update the coupon on the page
+        function updateCoupon() {
+            const schoolName = schoolNameInput.value;
+            const contactName = contactNameInput.value;
+            const mobileNo = mobileNoInput.value;
+            const breakfastCount = breakfastInput.value;
+            const lunchCount = lunchInput.value;
+            const dinnerCount = dinnerInput.value;
+
+            couponSchoolName.textContent = schoolName;
+            couponContactName.textContent = contactName;
+            couponMobileNo.textContent = mobileNo;
+            couponBreakfast.textContent = breakfastCount;
+            couponLunch.textContent = lunchCount;
+            couponDinner.textContent = dinnerCount;
+
+            couponDisplay.style.display = 'block';
+        }
+
+        // Generate & Print button
+        document.getElementById('generate-print-btn').addEventListener('click', function(event) {
             event.preventDefault();
-
-            // Select the columns for the coupons
-            const schoolColumn = document.getElementById('school-column');
-            const catererColumn = document.getElementById('caterer-column');
-            
-            // Clear any previous coupons, but keep the header
-            schoolColumn.innerHTML = '<h3>School\'s Copy</h3>';
-            catererColumn.innerHTML = '<h3>Caterer\'s Copy</h3>';
-
-            // Get all input fields
-            const schoolNames = document.querySelectorAll('.school-name');
-            const contactNames = document.querySelectorAll('.contact-name');
-            const mobileNos = document.querySelectorAll('.mobile-no');
-            const mealCounts = document.querySelectorAll('.meal-count');
-
-            // Loop through each school entry
-            for (let i = 0; i < schoolNames.length; i++) {
-                const schoolName = schoolNames[i].value;
-                const contactName = contactNames[i].value;
-                const mobileNo = mobileNos[i].value;
-                const mealCount = mealCounts[i].value;
-
-                // Only generate coupons if at least one field is filled
-                if (schoolName || contactName || mobileNo || mealCount) {
-                    // Create School's Coupon
-                    const schoolCoupon = `
-                        <div class="coupon">
-                            <div class="coupon-title">Sishu Mangal Parsat</div>
-                            <div class="coupon-subtitle">Golden Jubilee Celebration</div>
-                            <div class="coupon-details">
-                                <p><strong>School Name:</strong> ${schoolName}</p>
-                                <p><strong>Contact Person:</strong> ${contactName}</p>
-                                <p><strong>Mobile No:</strong> ${mobileNo}</p>
-                                <p><strong>Meals:</strong> <span class="highlight">${mealCount}</span></p>
-                            </div>
-                        </div>
-                    `;
-                    schoolColumn.innerHTML += schoolCoupon;
-
-                    // Create Caterer's Coupon
-                    const catererCoupon = `
-                        <div class="coupon">
-                            <div class="coupon-title">Sishu Mangal Parsat</div>
-                            <div class="coupon-subtitle">Golden Jubilee Celebration</div>
-                            <div class="coupon-details">
-                                <p><strong>School Name:</strong> ${schoolName}</p>
-                                <p><strong>Contact Person:</strong> ${contactName}</p>
-                                <p><strong>Mobile No:</strong> ${mobileNo}</p>
-                                <p><strong>Meals:</strong> <span class="highlight">${mealCount}</span></p>
-                            </div>
-                        </div>
-                    `;
-                    catererColumn.innerHTML += catererCoupon;
-                }
+            if (document.getElementById('input-form').checkValidity()) {
+                updateCoupon();
+                window.print();
+            } else {
+                alert('Please fill out all required fields.');
             }
-
-            // Trigger the print dialog
-            window.print();
         });
+
+        // WhatsApp button
+        document.getElementById('whatsapp-btn').addEventListener('click', function(event) {
+            event.preventDefault();
+            if (document.getElementById('input-form').checkValidity()) {
+                const schoolName = schoolNameInput.value;
+                const contactName = contactNameInput.value;
+                const mobileNo = mobileNoInput.value;
+                const breakfastCount = breakfastInput.value;
+                const lunchCount = lunchInput.value;
+                const dinnerCount = dinnerInput.value;
+
+                // Create the pre-filled message
+                const message = `*Sishu Mangal Parsat - Golden Jubilee Coupon*%0A%0A*School Name:* ${schoolName}%0A*Contact Person:* ${contactName}%0A*Mobile No:* ${mobileNo}%0A%0A*Meal Coupons Issued:*%0A- Breakfast: ${breakfastCount}%0A- Lunch: ${lunchCount}%0A- Dinner: ${dinnerCount}%0A%0A_Please present this message to receive your meals._`;
+
+                const whatsappUrl = `https://wa.me/?text=${message}`;
+
+                // Open WhatsApp
+                window.open(whatsappUrl, '_blank');
+            } else {
+                alert('Please fill out all required fields.');
+            }
+        });
+
     </script>
 </body>
 </html>
